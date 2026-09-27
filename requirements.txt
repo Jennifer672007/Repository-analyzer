@@ -1,0 +1,11 @@
+streamlit
+torch
+transformers
+xgboost
+scikit-learn
+pandas
+numpy
+joblib
+python-dotenv
+huggingface_hub
+GitPython
