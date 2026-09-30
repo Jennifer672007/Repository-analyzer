@@ -74,7 +74,8 @@ DEVICE = torch.device(
 
 load_dotenv()
 
-# Get Hugging Face token from local .env OR Streamlit Cloud Secrets
+# Get Hugging Face token from local .env
+# or Streamlit Cloud Secrets
 HF_TOKEN = os.getenv("HF_TOKEN")
 
 if not HF_TOKEN:
@@ -83,7 +84,7 @@ if not HF_TOKEN:
     except Exception:
         HF_TOKEN = None
 
-# Get model name
+# Get Hugging Face model
 HF_MODEL = os.getenv(
     "HF_MODEL",
     "Qwen/Qwen2.5-Coder-32B-Instruct"
@@ -104,6 +105,7 @@ if HF_TOKEN:
     )
 else:
     hf_client = None
+
 
 # =========================================================
 # SESSION STATE
