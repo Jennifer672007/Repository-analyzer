@@ -74,30 +74,29 @@ DEVICE = torch.device(
 
 load_dotenv()
 
-# Get Hugging Face token from local .env
-# or Streamlit Cloud Secrets
+# Local .env
 HF_TOKEN = os.getenv("HF_TOKEN")
 
+# Streamlit Cloud Secrets
 if not HF_TOKEN:
     try:
-        HF_TOKEN = st.secrets.get("HF_TOKEN")
+        HF_TOKEN = st.secrets["HF_TOKEN"]
     except Exception:
         HF_TOKEN = None
 
-# Get Hugging Face model
+
 HF_MODEL = os.getenv(
     "HF_MODEL",
     "Qwen/Qwen2.5-Coder-32B-Instruct"
 )
 
-if not HF_MODEL:
-    try:
-        HF_MODEL = st.secrets.get(
-            "HF_MODEL",
-            "Qwen/Qwen2.5-Coder-32B-Instruct"
-        )
-    except Exception:
-        HF_MODEL = "Qwen/Qwen2.5-Coder-32B-Instruct"
+# Get model from Streamlit Secrets if available
+try:
+    if "HF_MODEL" in st.secrets:
+        HF_MODEL = st.secrets["HF_MODEL"]
+except Exception:
+    pass
+
 
 if HF_TOKEN:
     hf_client = InferenceClient(
