@@ -1384,29 +1384,102 @@ if st.session_state.repo_path:
                 "No dependency files detected."
             )
 
-    # =====================================================
-    # README
-    # =====================================================
+   # =====================================================
+# README SUMMARY
+# =====================================================
 
-    st.subheader(
-        "📘 README Summary"
-    )
+st.subheader(
+    "📘 README Summary"
+)
 
-    if readme_content:
+if readme_content:
 
-        with st.expander(
-            "View README"
+    # Get README lines
+    readme_lines = readme_content.splitlines()
+
+    # Extract title
+    title = ""
+    for line in readme_lines:
+        if line.strip().startswith("# "):
+            title = line.strip().replace("# ", "", 1)
+            break
+
+    # Extract first meaningful description
+    description = ""
+    for line in readme_lines:
+        line = line.strip()
+
+        if (
+            line
+            and not line.startswith("#")
+            and not line.startswith("!")
+            and not line.startswith("[")
+            and len(line) > 30
         ):
+            description = line
+            break
 
-            st.text(
-                readme_content[:5000]
+    # Display short summary
+    if title:
+        st.markdown(f"**{title}**")
+
+    if description:
+        st.write(description)
+
+    # Show important README information
+    summary_points = []
+
+    for line in readme_lines:
+
+        line = line.strip()
+
+        if not line:
+            continue
+
+        lower_line = line.lower()
+
+        if any(keyword in lower_line for keyword in [
+            "requirements",
+            "python",
+            "dependencies",
+            "installation",
+            "docker",
+            "api",
+            "technology",
+            "framework"
+        ]):
+
+            clean_line = re.sub(
+                r"^#+\s*",
+                "",
+                line
             )
 
-    else:
+            clean_line = re.sub(
+                r"^[-*]\s*",
+                "",
+                clean_line
+            )
 
-        st.info(
-            "README not found."
+            if clean_line not in summary_points:
+                summary_points.append(clean_line)
+
+    # Display maximum 5 points
+    for point in summary_points[:5]:
+        st.write(f"• {point}")
+
+    # Full README
+    with st.expander("📄 View Full README"):
+
+        st.text(
+            readme_content[:10000]
         )
+
+else:
+
+    st.info(
+        "README not found."
+    )
 
     # =====================================================
     # SOURCE CODE
