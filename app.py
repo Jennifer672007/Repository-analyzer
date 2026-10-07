@@ -1392,21 +1392,43 @@ st.subheader(
     "📘 README Summary"
 )
 
+# Safely get README content
+readme_content = st.session_state.get(
+    "readme_content",
+    ""
+)
+
 if readme_content:
 
     # Get README lines
     readme_lines = readme_content.splitlines()
 
-    # Extract title
+    # -------------------------------------------------
+    # Extract README title
+    # -------------------------------------------------
+
     title = ""
+
     for line in readme_lines:
+
         if line.strip().startswith("# "):
-            title = line.strip().replace("# ", "", 1)
+
+            title = line.strip().replace(
+                "# ",
+                "",
+                1
+            )
+
             break
 
+    # -------------------------------------------------
     # Extract first meaningful description
+    # -------------------------------------------------
+
     description = ""
+
     for line in readme_lines:
+
         line = line.strip()
 
         if (
@@ -1416,17 +1438,35 @@ if readme_content:
             and not line.startswith("[")
             and len(line) > 30
         ):
+
             description = line
+
             break
 
-    # Display short summary
+    # -------------------------------------------------
+    # Display title
+    # -------------------------------------------------
+
     if title:
-        st.markdown(f"**{title}**")
+
+        st.markdown(
+            f"**{title}**"
+        )
+
+    # -------------------------------------------------
+    # Display description
+    # -------------------------------------------------
 
     if description:
-        st.write(description)
 
-    # Show important README information
+        st.write(
+            description
+        )
+
+    # -------------------------------------------------
+    # Extract important information
+    # -------------------------------------------------
+
     summary_points = []
 
     for line in readme_lines:
@@ -1438,16 +1478,19 @@ if readme_content:
 
         lower_line = line.lower()
 
-        if any(keyword in lower_line for keyword in [
-            "requirements",
-            "python",
-            "dependencies",
-            "installation",
-            "docker",
-            "api",
-            "technology",
-            "framework"
-        ]):
+        if any(
+            keyword in lower_line
+            for keyword in [
+                "requirements",
+                "python",
+                "dependencies",
+                "installation",
+                "docker",
+                "api",
+                "technology",
+                "framework"
+            ]
+        ):
 
             clean_line = re.sub(
                 r"^#+\s*",
@@ -1461,15 +1504,38 @@ if readme_content:
                 clean_line
             )
 
-            if clean_line not in summary_points:
-                summary_points.append(clean_line)
+            if (
+                clean_line
+                not in summary_points
+            ):
 
-    # Display maximum 5 points
-    for point in summary_points[:5]:
-        st.write(f"• {point}")
+                summary_points.append(
+                    clean_line
+                )
 
+    # -------------------------------------------------
+    # Display maximum 5 important points
+    # -------------------------------------------------
+
+    if summary_points:
+
+        st.markdown(
+            "**Important Information:**"
+        )
+
+        for point in summary_points[:5]:
+
+            st.write(
+                f"• {point}"
+            )
+
+    # -------------------------------------------------
     # Full README
-    with st.expander("📄 View Full README"):
+    # -------------------------------------------------
+
+    with st.expander(
+        "📄 View Full README"
+    ):
 
         st.text(
             readme_content[:10000]
