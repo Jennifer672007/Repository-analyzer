@@ -1253,83 +1253,176 @@ def compare_repositories(
 
 st.markdown("""
 <style>
+    .stApp {
+        background: #07111f;
+        color: #e8eef7;
+    }
+    [data-testid="stSidebar"] {
+        background: #0b1728;
+        border-right: 1px solid #1d3048;
+    }
+    [data-testid="stSidebar"] * {
+        color: #dbe7f5;
+    }
+    .hero {
+        padding: 20px 24px;
+        border: 1px solid #203650;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #0d2037 0%, #0a1627 100%);
+        margin-bottom: 24px;
+    }
+    .hero h1 { margin: 0 0 8px 0; font-size: 34px; }
+    .hero p { margin: 0; color: #9fb2c8; font-size: 16px; }
+    .section-title {
+        font-size: 25px;
+        font-weight: 700;
+        margin: 8px 0 18px 0;
+    }
+    .card {
+        background: #0d1b2d;
+        border: 1px solid #1f3650;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+    .metric-card {
+        background: #0d1b2d;
+        border: 1px solid #1f3650;
+        border-radius: 14px;
+        padding: 18px;
+        min-height: 105px;
+    }
+    .metric-label { color: #91a6bc; font-size: 13px; }
+    .metric-value { color: #f2f7fc; font-size: 27px; font-weight: 700; margin-top: 5px; }
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #142b43;
+        color: #a9d1ff;
+    }
+    .bug-card {
+        background: #24151a;
+        border: 1px solid #63313b;
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 12px;
+    }
+    .ok-card {
+        background: #10241d;
+        border: 1px solid #285441;
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 12px;
+    }
+    .score {
+        font-size: 48px;
+        font-weight: 800;
+        line-height: 1;
+    }
+    .muted { color: #91a6bc; }
+    .small-note { color: #7f94aa; font-size: 12px; }
+    div[data-testid="stMetric"] {
+        background: #0d1b2d;
+        border: 1px solid #1f3650;
+        padding: 12px;
+        border-radius: 12px;
+    }
 
-.block-container {
-    max-width: 1000px;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-}
+    [data-testid="stSidebar"] {
+        display: none;
+    }
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 0 18px 0;
+        margin-bottom: 8px;
+    }
+    .topbar-brand {
+        font-size: 20px;
+        font-weight: 800;
+        color: #ffffff;
+    }
+    .topbar-brand span {
+        color: #4ea1ff;
+    }
+    .topbar-subtitle {
+        color: #7188a2;
+        font-size: 13px;
+    }
+    .bottom-nav-title {
+        margin-top: 28px;
+        margin-bottom: 10px;
+        text-align: center;
+        color: #91a6bc;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+    .step-label {
+        text-align: center;
+        color: #667f99;
+        font-size: 12px;
+        margin-top: 8px;
+    }
 
-/* Main cards / boxes */
-div[data-testid="stVerticalBlockBorderWrapper"] {
-    padding: 0.45rem !important;
-    border-radius: 10px !important;
-}
-
-/* Hero / Home box */
-.hero-card {
-    padding: 22px 28px !important;
-    min-height: 0 !important;
-    margin-bottom: 16px !important;
-}
-
-.hero-card h1 {
-    font-size: 2rem !important;
-    line-height: 1.15 !important;
-    margin-bottom: 10px !important;
-}
-
-.hero-card p {
-    font-size: 0.9rem !important;
-    line-height: 1.4 !important;
-}
-
-/* Metrics */
-div[data-testid="stMetric"] {
-    padding: 0.4rem 0.55rem !important;
-}
-
-div[data-testid="stMetricValue"] {
-    font-size: 1.35rem !important;
-}
-
-div[data-testid="stMetricLabel"] {
-    font-size: 0.72rem !important;
-}
-
-/* Input */
-div[data-baseweb="input"] {
-    min-height: 38px !important;
-}
-
-/* Buttons */
-.stButton > button {
-    min-height: 36px !important;
-    padding: 0.35rem 0.75rem !important;
-    font-size: 0.82rem !important;
-}
-
-/* Reduce spacing */
-div[data-testid="stVerticalBlock"] {
-    gap: 0.4rem;
-}
-
-div[data-testid="stHorizontalBlock"] {
-    gap: 0.6rem;
-}
-
-/* Expander */
-details[data-testid="stExpander"] summary {
-    padding: 0.5rem 0.7rem !important;
-}
-
-/* Dataframe */
-div[data-testid="stDataFrame"] {
-    max-height: 280px;
-}
-
+    .home-hero {
+        padding: 58px 48px;
+        border: 1px solid #1e4b76;
+        border-radius: 20px;
+        background: radial-gradient(circle at 82% 28%, rgba(76, 64, 202, .32), transparent 35%), linear-gradient(135deg, #0a1b31 0%, #0a1730 55%, #171a42 100%);
+        margin-bottom: 34px;
+    }
+    .home-hero .eyebrow {
+        color: #70b5ff;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        margin-bottom: 15px;
+    }
+    .home-hero h1 {
+        margin: 0;
+        font-size: 48px;
+        line-height: 1.08;
+        font-weight: 850;
+    }
+    .blue-text { color: #3d9bff; }
+    .purple-text { color: #b86bff; }
+    .home-hero p {
+        max-width: 720px;
+        color: #9cc4f4;
+        font-size: 15px;
+        line-height: 1.8;
+        margin: 24px 0 0 0;
+    }
+    .start-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 14px;
+    }
+    div[data-testid="stTextInput"] input {
+        background: #20212a;
+        border: 1px solid #2a405d;
+        color: #e8eef7;
+        border-radius: 9px;
+    }
+    .footer {
+        text-align: center;
+        color: #60768e;
+        font-size: 12px;
+        margin-top: 28px;
+        padding-top: 16px;
+        border-top: 1px solid #17304a;
+    }
+    div.stButton > button {
+        border-radius: 10px;
+        min-height: 2.65rem;
+        font-weight: 700;
+    }
 </style>
 """, unsafe_allow_html=True)
 
