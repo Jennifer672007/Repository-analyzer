@@ -43,22 +43,22 @@ def go_to(page):
 st.markdown("""
 <style>
     .block-container {
-        max-width: 1100px;
-        padding-top: 1.5rem;
-        padding-bottom: 2rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
+        max-width: 1000px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
 
     /* Main hero / section cards */
     .hero-card {
-        padding: 32px 38px !important;
+        padding: 22px 28px !important;
         min-height: 0 !important;
         margin-bottom: 22px !important;
     }
 
     .hero-card h1 {
-        font-size: 2.45rem !important;
+        font-size: 2rem !important;
         line-height: 1.15 !important;
         margin-bottom: 14px !important;
     }
@@ -70,7 +70,7 @@ st.markdown("""
 
     /* Compact Streamlit containers */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        padding: 0.65rem !important;
+        padding: 0.45rem !important;
     }
 
     div[data-testid="stMetric"] {
@@ -95,14 +95,14 @@ st.markdown("""
     }
 
     .stButton > button {
-        min-height: 40px !important;
-        padding: 0.45rem 0.9rem !important;
-        font-size: 0.88rem !important;
+        min-height: 36px !important;
+        padding: 0.35rem 0.9rem !important;
+        font-size: 0.82rem !important;
     }
 
     /* Reduce vertical gaps */
     div[data-testid="stVerticalBlock"] {
-        gap: 0.55rem;
+        gap: 0.4rem;
     }
 
     div[data-testid="stHorizontalBlock"] {
@@ -1371,11 +1371,11 @@ st.markdown("""
     }
 
     .home-hero {
-        padding: 58px 48px;
+        padding: 30px 34px;
         border: 1px solid #1e4b76;
         border-radius: 20px;
         background: radial-gradient(circle at 82% 28%, rgba(76, 64, 202, .32), transparent 35%), linear-gradient(135deg, #0a1b31 0%, #0a1730 55%, #171a42 100%);
-        margin-bottom: 34px;
+        margin-bottom: 24px;
     }
     .home-hero .eyebrow {
         color: #70b5ff;
@@ -1386,7 +1386,7 @@ st.markdown("""
     }
     .home-hero h1 {
         margin: 0;
-        font-size: 48px;
+        font-size: 40px;
         line-height: 1.08;
         font-weight: 850;
     }
@@ -1395,9 +1395,9 @@ st.markdown("""
     .home-hero p {
         max-width: 720px;
         color: #9cc4f4;
-        font-size: 15px;
-        line-height: 1.8;
-        margin: 24px 0 0 0;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 16px 0 0 0;
     }
     .start-title {
         font-size: 26px;
