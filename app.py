@@ -5,7 +5,7 @@ import numpy as np
 import streamlit as st
 import torch
 
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer,AutoModel
 from xgboost import XGBClassifier
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
