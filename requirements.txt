@@ -10,3 +10,4 @@ joblib
 python-dotenv
 huggingface_hub
 GitPython
+google-genai

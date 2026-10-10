@@ -5,10 +5,10 @@ import numpy as np
 import streamlit as st
 import torch
 
-from transformers import AutoTokenizer,AutoModel
+from google import genai
+from transformers import AutoTokenizer, AutoModel
 from xgboost import XGBClassifier
 from dotenv import load_dotenv
-from huggingface_hub import InferenceClient
 
 from github_analyzer import (
     clone_repository,
@@ -166,42 +166,8 @@ DEVICE = torch.device(
 )
 
 
-# =========================================================
-# HUGGING FACE
-# =========================================================
 
 load_dotenv()
-
-# Local .env
-HF_TOKEN = os.getenv("HF_TOKEN")
-
-# Streamlit Cloud Secrets
-if not HF_TOKEN:
-    try:
-        HF_TOKEN = st.secrets["HF_TOKEN"]
-    except Exception:
-        HF_TOKEN = None
-
-
-HF_MODEL = os.getenv(
-    "HF_MODEL",
-    "Qwen/Qwen2.5-Coder-32B-Instruct"
-)
-
-# Get model from Streamlit Secrets if available
-try:
-    if "HF_MODEL" in st.secrets:
-        HF_MODEL = st.secrets["HF_MODEL"]
-except Exception:
-    pass
-
-
-if HF_TOKEN:
-    hf_client = InferenceClient(
-        token=HF_TOKEN
-    )
-else:
-    hf_client = None
 
 
 # =========================================================
@@ -791,79 +757,43 @@ def add_line_numbers(code):
 # AI FIX
 # =========================================================
 
-def generate_ai_fix(
-    code,
-    filename
-):
 
-    if hf_client is None:
+def generate_ai_fix(code, filename):
+    try:
+        api_key = st.secrets.get("GEMINI_API_KEY")
 
-        return (
-            "Hugging Face token not configured. "
-            "Please add HF_TOKEN to your .env file."
-        )
+        if not api_key:
+            return "Error: GEMINI_API_KEY is missing in Streamlit Secrets."
 
-    numbered_code = add_line_numbers(
-        code
-    )
+        client = genai.Client(api_key=api_key)
 
-    prompt = f"""
+        prompt = f"""
 You are an expert software debugging assistant.
 
-Analyze the following source code.
-
-Filename:
-{filename}
+Filename: {filename}
 
 Code:
-{numbered_code}
+{code}
 
-Provide the response in exactly these sections:
-
+Give a concise result with these sections:
 Bug Location:
-Problematic Code:
 Bug Explanation:
 Suggested Fix:
 Corrected Code:
 
-If no obvious bug exists, clearly state that.
-Do not invent a bug.
+Do not invent bugs. Preserve the original code's intent.
 """
 
-    try:
-
-        response = hf_client.chat_completion(
-
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are an expert "
-                        "code debugging assistant."
-                    )
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-
-            model=HF_MODEL,
-
-            max_tokens=3000,
-
-            temperature=0.2
+        response = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=prompt
+       
         )
 
-        return (
-            response
-            .choices[0]
-            .message.content
-        )
+        return response.text or "Gemini returned an empty response."
 
     except Exception as e:
-
-        return f"AI Fix Error: {e}"
+        return f"Gemini AI Fix Error: {str(e)}"
 
 
 # =========================================================
@@ -1810,49 +1740,90 @@ elif st.session_state.page == "🐛 Bug Detection":
             st.info("No bug detection results yet. Click the button above to run the model.")
 
 
+
 # =========================================================
 # AI FIX & SUGGESTIONS
 # =========================================================
 
 elif st.session_state.page == "🤖 AI Fix & Suggestions":
     if not repo_loaded:
-        page_header("🤖 AI Fix & Suggestions", "Generate explanations and corrected code for detected bugs.")
+        page_header(
+            "🤖 AI Fix & Suggestions",
+            "Generate explanations and corrected code for detected bugs."
+        )
         st.info("Analyze a repository first from Home.")
+
     else:
-        page_header("🤖 AI Fix & Suggestions", "Use the configured Hugging Face coding model to explain and suggest fixes for detected bugs.")
+        page_header(
+            "🤖 AI Fix & Suggestions",
+            "Use Gemini AI to explain detected bugs and suggest corrected code."
+        )
 
         if not results:
             st.warning("Run AI Bug Detection first.")
+
             if st.button("🐛 Go to Bug Detection", type="primary"):
                 go_to("🐛 Bug Detection")
+
         else:
-            bug_results = [r for r in results if r["label"] == "Bug"]
+            bug_results = [
+                r for r in results
+                if str(r.get("label", "")).strip().lower()
+                in ("bug", "buggy")
+            ]
+
             if not bug_results:
-                st.success("No files were classified as buggy. No AI fix is required.")
+                st.success(
+                    "No files were classified as buggy. "
+                    "No AI fix is required."
+                )
+
             else:
-                st.markdown(f"### {len(bug_results)} detected bug(s) available for AI analysis")
+                st.markdown(
+                    f"### {len(bug_results)} detected bug(s) "
+                    "available for AI analysis"
+                )
+
                 for index, result in enumerate(bug_results):
                     filename = result["filename"]
                     confidence = result.get("confidence", 0)
+
                     st.markdown(
                         f"<div class='bug-card'><b>🐛 {filename}</b><br>"
                         f"Model confidence: {confidence:.1f}%</div>",
                         unsafe_allow_html=True
                     )
 
-                    if st.button("🔧 Find Bug Line & Generate Fix", key=f"ai_fix_{index}", use_container_width=True):
+                    if st.button(
+                        "🔧 Find Bug Line & Generate Fix",
+                        key=f"ai_fix_{index}",
+                        use_container_width=True
+                    ):
                         try:
-                            code_index = st.session_state.filenames.index(filename)
+                            code_index = st.session_state.filenames.index(
+                                filename
+                            )
                             code = st.session_state.codes[code_index]
-                            with st.spinner("AI is analyzing the code and generating a fix..."):
+
+                            with st.spinner(
+                                "Gemini AI is analyzing the code "
+                                "and generating a fix..."
+                            ):
                                 fix = generate_ai_fix(code, filename)
+
                             st.session_state.ai_fixes[filename] = fix
+
                         except Exception as e:
                             st.error(f"AI Fix failed: {e}")
 
                     if filename in st.session_state.ai_fixes:
-                        with st.expander(f"📋 AI Analysis — {filename}", expanded=True):
-                            st.markdown(st.session_state.ai_fixes[filename])
+                        with st.expander(
+                            f"📋 AI Analysis — {filename}",
+                            expanded=True
+                        ):
+                            st.markdown(
+                                st.session_state.ai_fixes[filename]
+                            )
 
 
 # =========================================================
